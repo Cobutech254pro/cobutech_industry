@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - COBU-TECH INDUSTRY</title>
+    <link rel="stylesheet" href="/public/css/signin.css">
+</head>
+<body>
+    <div class="signin-container">
+        <h1>Sign In</h1>
+
+        <button id="googleSignInButton" class="google-button">Sign in with Google</button>
+
+        <div class="separator">OR</div>
+
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <div id="email-validation-message" class="validation-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div id="password-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" required>
+                        <span class="password-toggle" id="passwordToggle">Show</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password:</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                        <span class="password-toggle" id="confirmConfirmToggle">Show</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group terms-group">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">I agree to the <a href="/terms.html">Terms and Conditions</a></label>
+            </div>
+
+            <button type="submit" class="submit-button">Sign Up</button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="/login.html">Log In</a>
+        </div>
+    </div>
+
+    <script src="/public/js/signin.js"></script>
+</body>
+</html>
