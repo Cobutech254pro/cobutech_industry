@@ -1,0 +1,95 @@
+/* frontend/public/css/main.css */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: black;
+    overflow: hidden; /* Hide scrollbars for the code rain */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align items from the top */
+    min-height: 100vh;
+    color: white;
+    padding-top: 20px; /* Add some top padding for the profile picture */
+    box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+.profile-container {
+    width: 6cm;
+    height: 6cm;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.welcome-container {
+    margin-bottom: 30px;
+    overflow: hidden; /* For the typing animation effect */
+}
+
+.welcome-text {
+    font-size: 2em;
+    white-space: nowrap;
+    border-right: .15em solid orange; /* Cursor effect */
+    animation: typing 3.5s steps(20, end), blink-caret .75s step-end infinite alternate;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: orange; }
+}
+
+.continue-prompt {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.purple-button {
+    background-color: purple;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.purple-button:hover {
+    background-color: darkpurple;
+}
+
+.auth-buttons {
+    display: none; /* Initially hidden */
+    margin-bottom: 30px;
+}
+
+.auth-buttons button {
+    margin: 0 10px;
+}
+
+.contact-admin {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Code Rain Canvas Styling */
+#codeCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Behind other content */
+}
