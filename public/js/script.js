@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             industry.classList.add('visible');
             setTimeout(() => {
-                window.location.href = '/waiting.html';
+                window.location.href = '/public/waiting.html';
             }, 1000);
         }, 1000);
     }, 100);
