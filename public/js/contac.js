@@ -26,61 +26,40 @@ document.addEventListener('DOMContentLoaded', function() {
         followChannelsSubButtons.classList.remove('visible');
     });
 
-    // Flowing Social Media Logos Background
-    const canvas = document.getElementById('socialLogosCanvas');
+    // Code Rain Background
+    const canvas = document.getElementById('socialLogosCanvas'); // Reusing the canvas ID
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const logos = ['tiktok', 'facebook', 'instagram', 'twitter', 'github', 'telegram', 'whatsapp', 'youtube'];
-    const logoSize = 50;
-    const numLogos = 50;
-    const logoPositions = [];
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
 
-    for (let i = 0; i < numLogos; i++) {
-        logoPositions.push({
-            logo: logos[Math.floor(Math.random() * logos.length)],
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            speedX: (Math.random() - 0.5) * 0.5,
-            speedY: (Math.random() - 0.5) * 0.5
-        });
+    for (let i = 0; i < columns; i++) {
+        drops[i] = 1;
     }
 
-    function drawLogos() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (const pos of logoPositions) {
-            const img = new Image();
-            img.src = `/public/images/${pos.logo}.png`; // Assuming you have logo images in /public/images/
-            ctx.drawImage(img, pos.x, pos.y, logoSize, logoSize);
+    function drawCodeRain() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ff4d4d'; // Shining reddish color
+        ctx.font = fontSize + 'px monospace';
 
-            pos.x += pos.speedX;
-            pos.y += pos.speedY;
-
-            // Keep logos within bounds
-            if (pos.x < -logoSize) pos.x = canvas.width;
-            if (pos.x > canvas.width) pos.x = -logoSize;
-            if (pos.y < -logoSize) pos.y = canvas.height;
-            if (pos.y > canvas.height) pos.y = -logoSize;
-        }
-        requestAnimationFrame(drawLogos);
-    }
-
-    // Preload images and then start animation
-    let imagesLoaded = 0;
-    const totalImages = logos.length;
-    for (const logo of logos) {
-        const img = new Image();
-        img.onload = () => {
-            imagesLoaded++;
-            if (imagesLoaded === totalImages) {
-                drawLogos();
+        for (let i = 0; i < drops.length; i++) {
+            const text = letters[Math.floor(Math.random() * letters.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            drops[i]++;
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
+                drops[i] = 0;
             }
-        };
-        img.src = `/public/images/${logo}.png`;
+        }
     }
 
-    window.addEventListener('resize', () => {
+    setInterval(drawCodeRain, 30);
+
+    window.addEventListener('resize', function() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     });
