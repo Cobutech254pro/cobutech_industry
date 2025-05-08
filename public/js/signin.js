@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function isValidEmail(email) {
-        // Basic email validation regex
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
@@ -44,25 +43,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     signupForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
         if (!isEmailValid) {
-            event.preventDefault(); // Prevent submission if email is not valid
             emailValidationMessage.textContent = 'Please enter a valid email address.';
             return;
         }
 
         if (passwordInput.value !== confirmPasswordInput.value) {
-            event.preventDefault();
             alert("Passwords do not match!");
             return;
         }
 
-        // In a real scenario, you would send the form data to your backend here
-        console.log("Form submitted", {
+        const formData = {
             email: emailInput.value,
             name: nameInput.value,
-            password: passwordInput.value,
-            terms: document.getElementById('terms').checked
+            password: passwordInput.value
+        };
+
+        fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (response.ok) {
+                alert(data.message); // Show success message (e.g., "User created successfully...")
+                // Optionally, redirect the user to a "check your email" page
+            } else {
+                alert(data.message); // Show error message from the backend (e.g., "Email already exists", "Failed to create user")
+            }
+        })
+        .catch(error => {
+            console.error('Error during signup:', error);
+            alert('An unexpected error occurred during signup.');
         });
-        // You would then handle the backend logic to store the details.
     });
 });
