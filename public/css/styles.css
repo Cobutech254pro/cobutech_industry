@@ -1,0 +1,22 @@
+/* frontend/public/css/styles.css */
+body {
+    background-color: blue;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.brand-name {
+    opacity: 0;
+    font-size: 2em;
+    color: white;
+    text-align: center;
+    transition: opacity 2s ease-in-out;
+}
+
+.brand-name.visible {
+    opacity: 1;
+}
