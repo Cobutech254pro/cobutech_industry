@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const authButtonsDiv = document.querySelector('.auth-buttons');
     const signInButton = document.getElementById('signInButton');
     const loginButton = document.getElementById('loginButton');
+    const contactButton = document.getElementById('contactButton'); // Get the contact button element
     const fullText = 'WELCOME TO COBU-TECH INDUSTRY';
     let textIndex = 0;
     let isTyping = true;
@@ -47,13 +48,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     signInButton.addEventListener('click', function() {
-        window.location.href = '/signin.html'; // Replace with your actual sign-in page URL
+        window.location.href = '/public/signin.html'; // Replace with your actual sign-in page URL
         flashButton(this);
     });
 
     loginButton.addEventListener('click', function() {
-        window.location.href = '/login.html'; // Replace with your actual login page URL
+        window.location.href = '/public/login.html'; // Replace with your actual login page URL
         flashButton(this);
+    });
+
+    // Add event listener for the contact button
+    contactButton.addEventListener('click', function() {
+        window.location.href = '/public/contact.html'; // Redirect to the contact page
     });
 
     // Code Rain Background
