@@ -1,0 +1,12 @@
+{
+  "name": "cobutech_industry",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/server.js",
+  "scripts": {
+    "start-backend": "server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
