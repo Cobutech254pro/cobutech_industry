@@ -10,40 +10,45 @@ const port = process.env.PORT || 5000; // Use environment port or default to 500
 
 app.use(express.json());
 
-// Serve static files from the root directory
+// Serve static files from the root directory (consider if your frontend is separate)
 app.use(express.static(path.join(__dirname, '../')));
 
-// Define a route for the root path to serve index.html
+// Define a route for the root path to serve index.html (consider if your frontend is separate)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 const uri = process.env.MONGODB_URI; // Use environment variable for MongoDB URI
-
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
+let dbClient; // Store the MongoDB client instance
+let cobutechDB; // Store the database instance
 
 async function connectDB() {
   try {
-    await client.connect();
+    dbClient = new MongoClient(uri, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      }
+    });
+    await dbClient.connect();
     console.log("Connected to MongoDB!");
-    return client.db('cobutech');
+    cobutechDB = dbClient.db('cobutech');
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     process.exit(1);
   }
 }
 
+connectDB().catch(console.error); // Connect to the database when the server starts
+
 // Signup API endpoint
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const db = await connectDB();
-    const usersCollection = db.collection('users');
+    if (!cobutechDB) {
+      return res.status(500).json({ message: 'Database connection not established.' });
+    }
+    const usersCollection = cobutechDB.collection('users');
     const { email, name, password } = req.body;
 
     const existingUser = await usersCollection.findOne({ email });
@@ -76,12 +81,20 @@ app.post('/api/auth/signup', async (req, res) => {
   } catch (error) {
     console.error("Error during signup:", error);
     res.status(500).json({ message: 'Internal server error' });
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
   }
 });
 
+// TODO: Implement the /api/auth/login endpoint here
+
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
+});
+
+// Close the MongoDB connection when the Node.js process exits
+process.on('SIGINT', async () => {
+  console.log('Closing MongoDB connection...');
+  if (dbClient) {
+    await dbClient.close();
+  }
+  process.exit(0);
 });
