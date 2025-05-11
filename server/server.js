@@ -58,13 +58,15 @@ app.post('/api/auth/signup', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationCode = crypto.randomBytes(20).toString('hex'); // Generate a unique verification code
+    const verificationCodeExpiresAt = new Date(Date.now() + 30 * 60 * 1000); // Expires in 30 minutes (adjust as needed)
 
     const newUser = {
       email,
       name,
       password: hashedPassword,
       isVerified: false, // Initially false
-      verificationCode: verificationCode
+      verificationCode: verificationCode,
+      verificationCodeExpiresAt: verificationCodeExpiresAt
     };
 
     const result = await usersCollection.insertOne(newUser);
@@ -81,6 +83,44 @@ app.post('/api/auth/signup', async (req, res) => {
   } catch (error) {
     console.error("Error during signup:", error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Verify API endpoint
+app.post('/api/auth/verify/:verificationCode', async (req, res) => {
+  try {
+    if (!cobutechDB) {
+      return res.status(500).json({ message: 'Database connection not established.' });
+    }
+    const usersCollection = cobutechDB.collection('users');
+    const { verificationCode } = req.params;
+
+    const user = await usersCollection.findOne({ verificationCode: verificationCode });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Invalid verification link.' });
+    }
+
+    if (user.isVerified) {
+      return res.status(200).json({ message: 'Account already verified.' });
+    }
+
+    if (new Date(user.verificationCodeExpiresAt) < new Date()) {
+      return res.status(400).json({ message: 'Verification link has expired. Please request a new one.' });
+    }
+
+    await usersCollection.updateOne(
+      { _id: user._id },
+      { $set: { isVerified: true }, $unset: { verificationCode: 1, verificationCodeExpiresAt: 1 } }
+    );
+
+    res.status(200).json({ message: 'Account verified successfully!' });
+    // TODO: Redirect the user to the account/userhtml directory
+    console.log('Account verified successfully! Redirect user to account/userhtml');
+
+  } catch (error) {
+    console.error("Error during verification:", error);
+    res.status(500).json({ message: 'Internal server error during verification.' });
   }
 });
 
