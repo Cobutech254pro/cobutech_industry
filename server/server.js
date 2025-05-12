@@ -1,9 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto'); // For generating verification codes
 const path = require('path'); // Import the 'path' module
+const signupRoutes = require('./signup'); // Import the signup routes
 
 const app = express();
 const port = process.env.PORT || 5000; // Use environment port or default to 5000
@@ -34,6 +33,8 @@ async function connectDB() {
     await dbClient.connect();
     console.log("Connected to MongoDB!");
     cobutechDB = dbClient.db('cobutech');
+    // Set the database instance for the signup routes
+    signupRoutes.setDatabase(cobutechDB);
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     process.exit(1);
@@ -42,89 +43,10 @@ async function connectDB() {
 
 connectDB().catch(console.error); // Connect to the database when the server starts
 
-// Signup API endpoint
-app.post('/api/auth/signup', async (req, res) => {
-  try {
-    if (!cobutechDB) {
-      return res.status(500).json({ message: 'Database connection not established.' });
-    }
-    const usersCollection = cobutechDB.collection('users');
-    const { email, name, password } = req.body;
+// Use the signup routes
+app.use('/', signupRoutes.router);
 
-    const existingUser = await usersCollection.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ message: 'Email already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationCode = crypto.randomBytes(20).toString('hex'); // Generate a unique verification code
-    const verificationCodeExpiresAt = new Date(Date.now() + 30 * 60 * 1000); // Expires in 30 minutes (adjust as needed)
-
-    const newUser = {
-      email,
-      name,
-      password: hashedPassword,
-      isVerified: false, // Initially false
-      verificationCode: verificationCode,
-      verificationCodeExpiresAt: verificationCodeExpiresAt
-    };
-
-    const result = await usersCollection.insertOne(newUser);
-
-    if (result.insertedId) {
-      // TODO: Implement email sending logic here using Nodemailer
-      // Send an email to the user with a link containing the verificationCode
-      console.log(`Verification link would be: http://yourdomain.com/api/auth/verify/${verificationCode}`);
-      res.status(201).json({ message: 'User created successfully. Please check your email to verify your account.' });
-    } else {
-      res.status(500).json({ message: 'Failed to create user' });
-    }
-
-  } catch (error) {
-    console.error("Error during signup:", error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Verify API endpoint
-app.post('/api/auth/verify/:verificationCode', async (req, res) => {
-  try {
-    if (!cobutechDB) {
-      return res.status(500).json({ message: 'Database connection not established.' });
-    }
-    const usersCollection = cobutechDB.collection('users');
-    const { verificationCode } = req.params;
-
-    const user = await usersCollection.findOne({ verificationCode: verificationCode });
-
-    if (!user) {
-      return res.status(404).json({ message: 'Invalid verification link.' });
-    }
-
-    if (user.isVerified) {
-      return res.status(200).json({ message: 'Account already verified.' });
-    }
-
-    if (new Date(user.verificationCodeExpiresAt) < new Date()) {
-      return res.status(400).json({ message: 'Verification link has expired. Please request a new one.' });
-    }
-
-    await usersCollection.updateOne(
-      { _id: user._id },
-      { $set: { isVerified: true }, $unset: { verificationCode: 1, verificationCodeExpiresAt: 1 } }
-    );
-
-    res.status(200).json({ message: 'Account verified successfully!' });
-    // TODO: Redirect the user to the account/userhtml directory
-    console.log('Account verified successfully! Redirect user to account/userhtml');
-
-  } catch (error) {
-    console.error("Error during verification:", error);
-    res.status(500).json({ message: 'Internal server error during verification.' });
-  }
-});
-
-// TODO: Implement the /api/auth/login endpoint here
+// TODO: Implement other API endpoints here (excluding login)
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
