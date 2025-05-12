@@ -3,6 +3,7 @@ const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const path = require('path'); // Import the 'path' module
 const signupRoutes = require('./signup'); // Import the signup routes
+const verificationRoutes = require('./verification'); // Import the verification routes
 
 const app = express();
 const port = process.env.PORT || 5000; // Use environment port or default to 5000
@@ -33,8 +34,9 @@ async function connectDB() {
     await dbClient.connect();
     console.log("Connected to MongoDB!");
     cobutechDB = dbClient.db('cobutech');
-    // Set the database instance for the signup routes
+    // Set the database instance for the signup and verification routes
     signupRoutes.setDatabase(cobutechDB);
+    verificationRoutes.setDatabase(cobutechDB);
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     process.exit(1);
@@ -45,6 +47,9 @@ connectDB().catch(console.error); // Connect to the database when the server sta
 
 // Use the signup routes
 app.use('/', signupRoutes.router);
+
+// Use the verification routes
+app.use('/', verificationRoutes.router);
 
 // TODO: Implement other API endpoints here (excluding login)
 
